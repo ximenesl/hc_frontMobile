@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator, 
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axiosConfig';
 import CertificateCard from '../components/CertificateCard';
+import { Feather, FontAwesome } from '@expo/vector-icons';
 
 const CertificateListScreen = () => {
   const { user, activeCourseId, token } = useContext(AuthContext);
@@ -100,16 +101,19 @@ const CertificateListScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Pesquisar certificados..."
-          placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={(text) => {
-            setSearchQuery(text);
-            setCurrentPage(0);
-          }}
-        />
+        <View style={styles.searchWrapper}>
+          <Feather name="search" size={18} color="#999" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Pesquisar certificados..."
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              setCurrentPage(0);
+            }}
+          />
+        </View>
       </View>
 
       <View style={styles.filterRow}>
@@ -165,7 +169,10 @@ const CertificateListScreen = () => {
             onPress={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
             disabled={currentPage === 0 || loading}
           >
-            <Text style={styles.pageButtonText}>Anterior</Text>
+            <View style={styles.pageButtonContent}>
+              <Feather name="chevron-left" size={16} color="#fff" style={{ marginRight: 4 }} />
+              <Text style={styles.pageButtonText}>Anterior</Text>
+            </View>
           </TouchableOpacity>
 
           <Text style={styles.pageIndicator}>
@@ -177,7 +184,10 @@ const CertificateListScreen = () => {
             onPress={() => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages - 1 || loading}
           >
-            <Text style={styles.pageButtonText}>Próxima</Text>
+            <View style={styles.pageButtonContent}>
+              <Text style={styles.pageButtonText}>Próxima</Text>
+              <Feather name="chevron-right" size={16} color="#fff" style={{ marginLeft: 4 }} />
+            </View>
           </TouchableOpacity>
         </View>
       )}
@@ -199,7 +209,7 @@ const CertificateListScreen = () => {
                   style={styles.closeHeaderButton} 
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text style={styles.closeHeaderButtonText}>✕</Text>
+                  <Feather name="x" size={20} color="#ffffff" />
                 </TouchableOpacity>
               </View>
 
@@ -251,7 +261,7 @@ const CertificateListScreen = () => {
                 
                 {selectedCertificate.arquivoTipo && selectedCertificate.arquivoTipo.includes('pdf') ? (
                   <View style={styles.pdfContainer}>
-                    <View style={styles.pdfIcon} />
+                    <FontAwesome name="file-pdf-o" size={40} color="#dc3545" style={{ marginBottom: 8 }} />
                     <Text style={styles.pdfText}>Documento em formato PDF</Text>
                   </View>
                 ) : (
@@ -294,12 +304,20 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
-  searchInput: {
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#e0e0e0',
     borderRadius: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
     paddingVertical: 10,
     fontSize: 14,
     color: '#333',
@@ -358,6 +376,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
+  },
+  pageButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   pageButtonDisabled: {
     backgroundColor: '#ccc',
@@ -498,15 +520,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pdfIcon: {
-    width: 40,
-    height: 45,
-    backgroundColor: '#dc3545',
-    borderRadius: 4,
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: '#dc3545',
-  },
+
   pdfText: {
     fontSize: 13,
     color: '#666',

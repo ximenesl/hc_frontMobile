@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../api/axiosConfig';
+import { Feather } from '@expo/vector-icons';
+
 
 const UploadProofScreen = ({ route, navigation }) => {
   const { courseId } = route.params || {};
@@ -106,10 +108,16 @@ const UploadProofScreen = ({ route, navigation }) => {
 
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.actionButton} onPress={() => handlePickImage('camera')}>
-          <Text style={styles.actionButtonText}>Câmera</Text>
+          <View style={styles.actionButtonContent}>
+            <Feather name="camera" size={18} color="#333" style={{ marginRight: 6 }} />
+            <Text style={styles.actionButtonText}>Câmera</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={() => handlePickImage('gallery')}>
-          <Text style={styles.actionButtonText}>Galeria</Text>
+          <View style={styles.actionButtonContent}>
+            <Feather name="image" size={18} color="#333" style={{ marginRight: 6 }} />
+            <Text style={styles.actionButtonText}>Galeria</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -118,9 +126,12 @@ const UploadProofScreen = ({ route, navigation }) => {
           <Image source={{ uri: imageUri }} style={styles.previewImage} resizeMode="contain" />
         ) : (
           <View style={styles.placeholderContainer}>
-            <View style={styles.placeholderIcon} />
+            <View style={styles.placeholderIconContainer}>
+              <Feather name="file-text" size={28} color="#004587" />
+            </View>
             <Text style={styles.placeholderText}>Posicione o documento no centro da câmera</Text>
           </View>
+
         )}
       </View>
 
@@ -183,6 +194,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 5,
   },
+  actionButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   actionButtonText: {
     fontSize: 15,
     fontWeight: 'bold',
@@ -212,7 +229,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
   },
-  placeholderIcon: {
+  placeholderIconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -220,6 +237,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 2,
     borderColor: '#004587',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   placeholderText: {
     fontSize: 14,

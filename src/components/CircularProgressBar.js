@@ -1,34 +1,40 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 const CircularProgressBar = ({ approvedHours, requiredHours }) => {
-  const isProgressed = approvedHours > 0;
+  const fill = requiredHours > 0 ? Math.min((approvedHours / requiredHours) * 100, 100) : 0;
 
   return (
-    <View style={styles.circleOuter}>
-      <View style={[styles.circleInner, { borderColor: isProgressed ? '#f2911b' : '#e0e0e0' }]}>
-        <Text style={styles.circleHoursText}>{approvedHours}</Text>
-        <Text style={styles.circleTotalText}>/ {requiredHours} h</Text>
-      </View>
+    <View style={styles.container}>
+      <AnimatedCircularProgress
+        size={140}
+        width={10}
+        fill={fill}
+        tintColor="#f2911b"
+        backgroundColor="#f0f4f8"
+        rotation={0}
+        lineCap="round"
+      >
+        {() => (
+          <View style={styles.textContainer}>
+            <Text style={styles.circleHoursText}>{approvedHours}</Text>
+            <Text style={styles.circleTotalText}>/ {requiredHours} h</Text>
+          </View>
+        )}
+      </AnimatedCircularProgress>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  circleOuter: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#f0f4f8',
+  container: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: 140,
+    height: 140,
   },
-  circleInner: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#fff',
-    borderWidth: 10,
+  textContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -46,3 +52,4 @@ const styles = StyleSheet.create({
 });
 
 export default CircularProgressBar;
+
