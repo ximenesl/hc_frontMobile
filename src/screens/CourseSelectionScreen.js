@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axiosConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CourseSelectionScreen = ({ route, navigation }) => {
   const { user } = useContext(AuthContext);
@@ -30,7 +31,7 @@ const CourseSelectionScreen = ({ route, navigation }) => {
       for (const courseId of selectedIds) {
         const rulesRes = await api.get(`/api/regras/curso/${courseId}`);
         const matchedRule = rulesRes.data.find(
-          r => r.tipo.toLowerCase() === category.toLowerCase()
+          r => (r.type || r.tipo).toLowerCase() === category.toLowerCase()
         ) || rulesRes.data[0];
 
         if (!matchedRule) {
@@ -38,22 +39,34 @@ const CourseSelectionScreen = ({ route, navigation }) => {
         }
 
         const formData = new FormData();
-        formData.append('alunoId', user.id);
+        formData.append('alunoId', String(user.id));
         formData.append('nome', name);
-        formData.append('cargaHoraria', duration);
+        formData.append('cargaHoraria', String(duration));
         
         const today = new Date().toISOString().split('T')[0];
         formData.append('dataEmissao', today);
-        formData.append('regraId', matchedRule.id);
+        formData.append('regraId', String(matchedRule.id));
 
-        const uriParts = imageUri.split('/');
+        const cleanUri = imageUri.split('?')[0].split('#')[0];
+        const uriParts = cleanUri.split('/');
         const fileName = uriParts[uriParts.length - 1];
-        const fileType = fileName.split('.').pop();
+        const ext = fileName.split('.').pop().toLowerCase();
+        let mimeType = 'application/octet-stream';
+        
+        if (ext === 'jpg' || ext === 'jpeg') {
+          mimeType = 'image/jpeg';
+        } else if (ext === 'png') {
+          mimeType = 'image/png';
+        } else if (ext === 'pdf') {
+          mimeType = 'application/pdf';
+        } else {
+          mimeType = `image/${ext}`;
+        }
 
         formData.append('arquivo', {
           uri: imageUri,
           name: fileName,
-          type: `image/${fileType === 'jpg' ? 'jpeg' : fileType}`,
+          type: mimeType,
         });
 
         await api.post('/api/certificates', formData, {

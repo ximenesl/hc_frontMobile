@@ -61,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
   const categories = ['Ensino', 'Pesquisa', 'Extensão'];
   
   const categoryProgress = categories.map(cat => {
-    const catRules = courseRules.filter(r => r.tipo === cat);
+    const catRules = courseRules.filter(r => r.type === cat);
     const catRuleIds = catRules.map(r => r.id);
     const catCerts = activeCertificates.filter(c => catRuleIds.includes(c.regraId) && (c.status === 'APROVADO' || c.status === 'DEFERIDO'));
     const catHours = catCerts.reduce((sum, c) => sum + (c.cargaHoraria || 0), 0);

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/axiosConfig';
 import { Feather } from '@expo/vector-icons';
 
@@ -9,6 +11,15 @@ const UploadProofScreen = ({ route, navigation }) => {
   const { courseId } = route.params || {};
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const isPdf = imageUri && imageUri.split('?')[0].split('#')[0].toLowerCase().endsWith('.pdf');
+
+  useEffect(() => {
+    if (route.params?.resetImage) {
+      setImageUri(null);
+      navigation.setParams({ resetImage: undefined });
+    }
+  }, [route.params?.resetImage]);
 
   const requestPermission = async (type) => {
     if (type === 'camera') {
@@ -30,13 +41,13 @@ const UploadProofScreen = ({ route, navigation }) => {
     let result;
     if (type === 'camera') {
       result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         quality: 1,
       });
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         quality: 1,
       });
@@ -44,6 +55,22 @@ const UploadProofScreen = ({ route, navigation }) => {
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handlePickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['image/*', 'application/pdf'],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (err) {
+      console.log(err);
+      Alert.alert('Erro', 'Não foi possível selecionar o arquivo.');
     }
   };
 
@@ -57,14 +84,26 @@ const UploadProofScreen = ({ route, navigation }) => {
       setLoading(true);
       const formData = new FormData();
       
-      const uriParts = imageUri.split('/');
+      const cleanUri = imageUri.split('?')[0].split('#')[0];
+      const uriParts = cleanUri.split('/');
       const fileName = uriParts[uriParts.length - 1];
-      const fileType = fileName.split('.').pop();
+      const ext = fileName.split('.').pop().toLowerCase();
+      let mimeType = 'application/octet-stream';
+      
+      if (ext === 'jpg' || ext === 'jpeg') {
+        mimeType = 'image/jpeg';
+      } else if (ext === 'png') {
+        mimeType = 'image/png';
+      } else if (ext === 'pdf') {
+        mimeType = 'application/pdf';
+      } else {
+        mimeType = `image/${ext}`;
+      }
 
       formData.append('arquivo', {
         uri: imageUri,
         name: fileName,
-        type: `image/${fileType === 'jpg' ? 'jpeg' : fileType}`,
+        type: mimeType,
       });
 
       const response = await api.post('/api/certificates/ocr', formData, {
@@ -119,11 +158,27 @@ const UploadProofScreen = ({ route, navigation }) => {
             <Text style={styles.actionButtonText}>Galeria</Text>
           </View>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={handlePickDocument}>
+          <View style={styles.actionButtonContent}>
+            <Feather name="file" size={18} color="#333" style={{ marginRight: 6 }} />
+            <Text style={styles.actionButtonText}>Arquivos</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.previewBox}>
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.previewImage} resizeMode="contain" />
+          isPdf ? (
+            <View style={styles.pdfPreviewContainer}>
+              <Feather name="file-text" size={80} color="#dc3545" />
+              <Text style={styles.pdfFileNameText} numberOfLines={2}>
+                {imageUri.split('/').pop().split('?')[0]}
+              </Text>
+              <Text style={styles.pdfFileTypeText}>Documento PDF</Text>
+            </View>
+          ) : (
+            <Image source={{ uri: imageUri }} style={styles.previewImage} resizeMode="contain" />
+          )
         ) : (
           <View style={styles.placeholderContainer}>
             <View style={styles.placeholderIconContainer}>
@@ -148,14 +203,17 @@ const UploadProofScreen = ({ route, navigation }) => {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.continueButtonText}>Analisar Comprovante (OCR)</Text>
+            <Text style={styles.continueButtonText}>Analisar Comprovante</Text>
           )}
         </TouchableOpacity>
       )}
 
       <TouchableOpacity 
         style={styles.cancelButton} 
-        onPress={() => navigation.getParent()?.navigate('Dashboard')}
+        onPress={() => {
+          setImageUri(null);
+          navigation.getParent()?.navigate('Dashboard');
+        }}
       >
         <Text style={styles.cancelButtonText}>Cancelar</Text>
       </TouchableOpacity>
@@ -284,6 +342,27 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  pdfPreviewContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    width: '100%',
+  },
+  pdfFileNameText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 16,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    lineHeight: 20,
+  },
+  pdfFileTypeText: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 8,
+    fontWeight: '600',
   },
 });
 

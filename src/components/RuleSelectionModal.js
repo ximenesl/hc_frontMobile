@@ -22,7 +22,7 @@ const RuleSelectionModal = ({ visible, rules, selectedRuleId, onSelectRule, onCl
                   onPress={() => onSelectRule(rule)}
                 >
                   <Text style={[styles.ruleItemType, isSelected && styles.ruleItemActiveText]}>
-                    {rule.tipo}
+                    {rule.type || rule.tipo}
                   </Text>
                   <Text style={[styles.ruleItemDesc, isSelected && styles.ruleItemActiveText]}>
                     {rule.descricao}

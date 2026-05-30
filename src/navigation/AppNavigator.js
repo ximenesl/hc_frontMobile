@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { ActivityIndicator, View, Image } from 'react-native';
+import { ActivityIndicator, View, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
@@ -35,6 +36,9 @@ const NewActivityStack = () => {
 };
 
 const MainTabs = () => {
+  const { logout } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -43,11 +47,28 @@ const MainTabs = () => {
           height: 80,
         },
         headerTitleAlign: 'center',
+        headerTitleContainerStyle: {
+          position: 'absolute',
+          left: 60,
+          right: 60,
+          top: 0,
+          bottom: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
         headerTitle: () => (
           <Image
             source={require('../../assets/logo-senac.png')}
-            style={{ width: 140, height: 42, resizeMode: 'contain' }}
+            style={{ width: '100%', height: 120, resizeMode: 'contain' }}
           />
+        ),
+        headerRight: () => (
+          <TouchableOpacity 
+            onPress={logout} 
+            style={{ marginRight: 16, padding: 8 }}
+          >
+            <Ionicons name="log-out-outline" size={24} color="#ffffff" />
+          </TouchableOpacity>
         ),
         tabBarActiveTintColor: '#eb8216',
         tabBarInactiveTintColor: '#666666',
@@ -55,8 +76,8 @@ const MainTabs = () => {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#e9ecef',
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
         },
         tabBarIcon: ({ color, focused }) => {

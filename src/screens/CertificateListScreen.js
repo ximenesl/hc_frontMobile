@@ -6,7 +6,7 @@ import CertificateCard from '../components/CertificateCard';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 
 const CertificateListScreen = () => {
-  const { user, activeCourseId, token } = useContext(AuthContext);
+  const { user, activeCourseId, selectCourse, token } = useContext(AuthContext);
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,6 +100,32 @@ const CertificateListScreen = () => {
 
   return (
     <View style={styles.container}>
+      {user?.cursos && user.cursos.length > 1 && (
+        <View style={styles.courseChipsWrapper}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            style={styles.courseChipsContainer}
+            contentContainerStyle={styles.courseChipsContent}
+          >
+            {user.cursos.map((c) => {
+              const isActive = c.id === activeCourseId;
+              return (
+                <TouchableOpacity
+                  key={c.id}
+                  style={[styles.courseChip, isActive && styles.courseChipActive]}
+                  onPress={() => selectCourse(c.id)}
+                >
+                  <Text style={[styles.courseChipText, isActive && styles.courseChipTextActive]}>
+                    {c.nome}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+      )}
+
       <View style={styles.searchContainer}>
         <View style={styles.searchWrapper}>
           <Feather name="search" size={18} color="#999" style={styles.searchIcon} />
@@ -298,6 +324,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+  },
+  courseChipsWrapper: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  courseChipsContainer: {
+    paddingHorizontal: 0,
+  },
+  courseChipsContent: {
+    paddingHorizontal: 16,
+  },
+  courseChip: {
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  courseChipActive: {
+    backgroundColor: '#004587',
+    borderColor: '#004587',
+  },
+  courseChipText: {
+    fontSize: 12,
+    color: '#495057',
+    fontWeight: '600',
+  },
+  courseChipTextActive: {
+    color: '#ffffff',
   },
   searchContainer: {
     paddingHorizontal: 16,

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axiosConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
@@ -46,7 +47,7 @@ const NewActivityScreen = ({ route, navigation }) => {
         setSubmitting(true);
         const rulesRes = await api.get(`/api/regras/curso/${singleCourseId}`);
         const matchedRule = rulesRes.data.find(
-          r => r.tipo.toLowerCase() === category.toLowerCase()
+          r => (r.type || r.tipo).toLowerCase() === category.toLowerCase()
         ) || rulesRes.data[0];
 
         if (!matchedRule) {
@@ -55,22 +56,34 @@ const NewActivityScreen = ({ route, navigation }) => {
         }
 
         const formData = new FormData();
-        formData.append('alunoId', user.id);
+        formData.append('alunoId', String(user.id));
         formData.append('nome', name);
-        formData.append('cargaHoraria', Number(duration));
+        formData.append('cargaHoraria', String(duration));
         
         const today = new Date().toISOString().split('T')[0];
         formData.append('dataEmissao', today);
-        formData.append('regraId', matchedRule.id);
+        formData.append('regraId', String(matchedRule.id));
 
-        const uriParts = imageUri.split('/');
+        const cleanUri = imageUri.split('?')[0].split('#')[0];
+        const uriParts = cleanUri.split('/');
         const fileName = uriParts[uriParts.length - 1];
-        const fileType = fileName.split('.').pop();
+        const ext = fileName.split('.').pop().toLowerCase();
+        let mimeType = 'application/octet-stream';
+        
+        if (ext === 'jpg' || ext === 'jpeg') {
+          mimeType = 'image/jpeg';
+        } else if (ext === 'png') {
+          mimeType = 'image/png';
+        } else if (ext === 'pdf') {
+          mimeType = 'application/pdf';
+        } else {
+          mimeType = `image/${ext}`;
+        }
 
         formData.append('arquivo', {
           uri: imageUri,
           name: fileName,
-          type: `image/${fileType === 'jpg' ? 'jpeg' : fileType}`,
+          type: mimeType,
         });
 
         await api.post('/api/certificates', formData, {
@@ -129,7 +142,7 @@ const NewActivityScreen = ({ route, navigation }) => {
       <CustomInput
         label="Carga horária (horas) *"
         value={duration}
-        onChangeText={setDuration}
+        onChangeText={(text) => setDuration(text.replace(/[^0-9]/g, ''))}
         placeholder="Ex: 20"
         keyboardType="numeric"
       />
@@ -157,7 +170,7 @@ const NewActivityScreen = ({ route, navigation }) => {
 
       <CustomButton
         title="Cancelar"
-        onPress={() => navigation.getParent()?.navigate('Dashboard')}
+        onPress={() => navigation.navigate('UploadProof', { resetImage: true })}
         type="secondary"
         style={styles.cancelButton}
       />
