@@ -9,57 +9,71 @@ const CertificateListScreen = () => {
   const { user, activeCourseId, selectCourse, token } = useContext(AuthContext);
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [currentPage, setCurrentPage] = useState(0);
+  const [page, setPage] = useState(0);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 10;
 
-  const fetchCertificates = useCallback(async () => {
+  const fetchCertificates = useCallback(async (pageNum = 0, reset = false, search = '', status = 'ALL') => {
     if (!user || !activeCourseId) return;
     try {
-      setLoading(true);
-      const res = await api.get(`/api/certificates/me/${user.id}?cursoId=${activeCourseId}&page=0&size=1000`);
-      setCertificates(res.data.content || []);
-      setCurrentPage(0);
+      if (reset) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const params = new URLSearchParams({
+        cursoId: activeCourseId,
+        page: pageNum,
+        size: ITEMS_PER_PAGE
+      });
+
+      if (status !== 'ALL') params.append('status', status);
+      if (search.trim()) params.append('search', search.trim());
+
+      const res = await api.get(`/api/certificates/me/${user.id}?${params.toString()}`);
+      
+      const newItems = res.data.content || [];
+      
+      if (reset) {
+        setCertificates(newItems);
+      } else {
+        setCertificates(prev => [...prev, ...newItems]);
+      }
+      
+      setHasMore(!res.data.last);
+      setPage(pageNum);
+
     } catch (error) {
       console.log(error);
-      if (!error.response) {
-        Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor para listar seus certificados.');
-      } else {
+      if (reset) {
         Alert.alert('Erro', 'Não foi possível carregar a lista de certificados.');
       }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [user, activeCourseId]);
 
   useEffect(() => {
-    fetchCertificates();
-  }, [fetchCertificates]);
+    // Debounce search
+    const delayDebounceFn = setTimeout(() => {
+      fetchCertificates(0, true, searchQuery, statusFilter);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, statusFilter, fetchCertificates]);
 
-  const filteredCertificates = certificates.filter((c) => {
-    const matchesSearch = c.nome.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    let matchesStatus = true;
-    if (statusFilter === 'PENDENTE') {
-      matchesStatus = c.status === 'PENDENTE';
-    } else if (statusFilter === 'APROVADO') {
-      matchesStatus = c.status === 'APROVADO' || c.status === 'DEFERIDO' || c.status === 'VALIDADO';
-    } else if (statusFilter === 'REJEITADO') {
-      matchesStatus = c.status === 'REJEITADO' || c.status === 'INDEFERIDO';
+  const loadMore = () => {
+    if (!loading && !loadingMore && hasMore) {
+      fetchCertificates(page + 1, false, searchQuery, statusFilter);
     }
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalPages = Math.ceil(filteredCertificates.length / ITEMS_PER_PAGE);
-  const paginatedCertificates = filteredCertificates.slice(
-    currentPage * ITEMS_PER_PAGE,
-    (currentPage + 1) * ITEMS_PER_PAGE
-  );
+  };
 
   const handleCardPress = (cert) => {
     setSelectedCertificate(cert);
@@ -136,7 +150,6 @@ const CertificateListScreen = () => {
             value={searchQuery}
             onChangeText={(text) => {
               setSearchQuery(text);
-              setCurrentPage(0);
             }}
           />
         </View>
@@ -156,7 +169,6 @@ const CertificateListScreen = () => {
               style={[styles.filterChip, isActive && styles.filterChipActive]}
               onPress={() => {
                 setStatusFilter(filter.id);
-                setCurrentPage(0);
               }}
             >
               <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
@@ -171,8 +183,8 @@ const CertificateListScreen = () => {
         <ActivityIndicator size="large" color="#004587" style={styles.loader} />
       ) : (
         <FlatList
-          data={paginatedCertificates}
-          keyExtractor={(item) => String(item.id)}
+          data={certificates}
+          keyExtractor={(item, index) => String(item.id) + '-' + index}
           renderItem={({ item }) => (
             <CertificateCard 
               item={item} 
@@ -180,42 +192,19 @@ const CertificateListScreen = () => {
             />
           )}
           contentContainerStyle={styles.listContent}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <ActivityIndicator size="small" color="#004587" style={{ marginVertical: 20 }} />
+            ) : null
+          }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>Nenhum certificado encontrado.</Text>
             </View>
           }
         />
-      )}
-
-      {totalPages > 1 && (
-        <View style={styles.pagination}>
-          <TouchableOpacity
-            style={[styles.pageButton, currentPage === 0 && styles.pageButtonDisabled]}
-            onPress={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 0 || loading}
-          >
-            <View style={styles.pageButtonContent}>
-              <Feather name="chevron-left" size={16} color="#fff" style={{ marginRight: 4 }} />
-              <Text style={styles.pageButtonText}>Anterior</Text>
-            </View>
-          </TouchableOpacity>
-
-          <Text style={styles.pageIndicator}>
-            Página {currentPage + 1} de {totalPages}
-          </Text>
-
-          <TouchableOpacity
-            style={[styles.pageButton, currentPage === totalPages - 1 && styles.pageButtonDisabled]}
-            onPress={() => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages - 1 || loading}
-          >
-            <View style={styles.pageButtonContent}>
-              <Text style={styles.pageButtonText}>Próxima</Text>
-              <Feather name="chevron-right" size={16} color="#fff" style={{ marginLeft: 4 }} />
-            </View>
-          </TouchableOpacity>
-        </View>
       )}
 
       {selectedCertificate && (
