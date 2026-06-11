@@ -2,7 +2,7 @@
 
 ---
 
-# 📱 SENAC HC Mobile: Gestão de Horas Complementares
+# SENAC HC Mobile: Gestão de Horas Complementares
 
 > Um aplicativo mobile desenvolvido em React Native e Expo para o gerenciamento e envio de horas complementares (atividades acadêmico-científico-culturais) de alunos de graduação do Senac. Desenvolvido como Projeto Integrador para o **Curso de Tecnologia em Análise e Desenvolvimento de Sistemas** do **Centro Universitário Senac**.
 
@@ -12,7 +12,7 @@
 
 ---
 
-## 📋 Visão Geral do Projeto
+## Visão Geral do Projeto
 
 O **SENAC HC Mobile** é o aplicativo móvel do ecossistema digital SENAC HC, projetado especificamente para que os estudantes possam enviar, acompanhar e controlar suas horas complementares de maneira fácil e prática a partir de seus dispositivos móveis. Através do aplicativo, os discentes podem fazer o envio de novos certificados via câmera ou arquivos locais, visualizar em tempo real o progresso percentual de suas horas aprovadas (por meio de gráficos circulares) e conferir o andamento detalhado e o status de cada solicitação.
 
@@ -26,7 +26,7 @@ O **SENAC HC Mobile** é o aplicativo móvel do ecossistema digital SENAC HC, pr
 
 ---
 
-## 🔒 LGPD & Privacidade de Dados (Lei Geral de Proteção de Dados)
+## LGPD & Privacidade de Dados (Lei Geral de Proteção de Dados)
 
 Por processar dados pessoais cadastrais dos discentes (como nome, RA, e-mail e vínculo de curso) e armazenar documentos comprobatórios que contêm informações pessoais e de terceiros (certificados de cursos, palestras e eventos), o aplicativo móvel do SENAC HC adota princípios de privacidade por design, em estrita conformidade com a Lei Federal nº 13.709/2018 (LGPD).
 
@@ -42,7 +42,7 @@ Por processar dados pessoais cadastrais dos discentes (como nome, RA, e-mail e v
 
 ---
 
-## 🛠️ Tecnologias Utilizadas (Mobile)
+## Tecnologias Utilizadas (Mobile)
 
 * **Framework Principal:** React Native com Expo (v54.0.35)
 * **Navegação:** React Navigation (Navegação baseada em Abas e Pilhas)
@@ -52,7 +52,7 @@ Por processar dados pessoais cadastrais dos discentes (como nome, RA, e-mail e v
 
 ---
 
-## ⚙️ Configuração e Execução Local (Desenvolvimento)
+## Configuração e Execução Local (Desenvolvimento)
 
 Siga os passos abaixo para configurar e executar o aplicativo móvel localmente.
 
@@ -83,7 +83,7 @@ Após o início, um QR Code será exibido no terminal e/ou no painel do Expo.
 
 ---
 
-## 📱 Telas & Fluxo de Navegação
+## Telas & Fluxo de Navegação
 
 * **Tela de Login (`LoginScreen.js`):** Ponto de entrada do aplicativo, permitindo que os discentes realizem autenticação segura por meio de e-mail e senha cadastrados.
 * **Esqueci minha Senha (`ForgotPasswordScreen.js`):** Interface para solicitar uma redefinição de senha, que dispara um e-mail com novas credenciais a partir do backend.
@@ -95,7 +95,7 @@ Após o início, um QR Code será exibido no terminal e/ou no painel do Expo.
 
 ---
 
-## 📝 Melhorias Futuras
+## Melhorias Futuras
 
 * **Notificações Push:** Envio de alertas em tempo real no dispositivo quando o status de um certificado for alterado pela coordenação.
 * **Suporte Offline com Cache Local:** Armazenamento local de informações de progresso do aluno para acesso offline sem dependência de internet ativa.
@@ -104,7 +104,7 @@ Após o início, um QR Code será exibido no terminal e/ou no painel do Expo.
 
 ---
 
-## 👥 Autores & Equipe do Projeto
+## Autores & Equipe do Projeto
 
 * **Homero Flávio**
 * **Joelson José**
@@ -114,14 +114,10 @@ Após o início, um QR Code será exibido no terminal e/ou no painel do Expo.
 * **Nicollas Abrão**
 * **Thayanne Rodrigues**
 
-### Orientadores Acadêmicos
-* **Professor Orientador / Coordenador:** Prof. ____________
-* **Professor de Inglês Técnico:** Prof. Leonardo Trevas
-
 ---
 ---
 
-# 📱 SENAC HC Mobile: Complementary Hours Management
+# SENAC HC Mobile: Complementary Hours Management
 
 > A mobile application developed in React Native and Expo for managing and submitting complementary hours (academic, scientific, and cultural activities) for Senac undergraduate students. Developed as a Capstone Project (*Projeto Integrador*) for the **Systems Analysis and Development Program** at **Senac College**.
 
@@ -131,7 +127,7 @@ Após o início, um QR Code será exibido no terminal e/ou no painel do Expo.
 
 ---
 
-## 📋 Project Overview
+## Project Overview
 
 **SENAC HC Mobile** is the mobile app of the digital ecosystem SENAC HC, specifically designed to empower students to submit, track, and monitor their complementary hours easily and conveniently from their mobile devices. Through the app, students can upload new certificates using their phone's camera or local files, view their approved hours progress in real-time (via circular charts), and check the detailed status of each request.
 
@@ -145,7 +141,7 @@ Após o início, um QR Code será exibido no terminal e/ou no painel do Expo.
 
 ---
 
-## 🔒 LGPD & Data Privacy Compliance (Lei Geral de Proteção de Dados)
+## LGPD & Data Privacy Compliance (Lei Geral de Proteção de Dados)
 
 Because this application processes personal registration details of students (such as name, academic record/RA, email, and course enrollment) and stores supporting documents containing personal information (certificates of courses, lectures, and events), the SENAC HC mobile application adopts privacy by design principles, in strict compliance with Brazilian Federal Law nº 13.709/2018 (LGPD).
 
@@ -161,7 +157,7 @@ Because this application processes personal registration details of students (su
 
 ---
 
-## 🛠️ Tech Stack (Mobile)
+## Tech Stack (Mobile)
 
 * **Main Framework:** React Native with Expo (v54.0.35)
 * **Navigation:** React Navigation (Tab-based and Stack-based navigation flow)
@@ -171,7 +167,7 @@ Because this application processes personal registration details of students (su
 
 ---
 
-## ⚙️ Getting Started (Local Development)
+## Getting Started (Local Development)
 
 Follow the steps below to configure and run the mobile application locally.
 
@@ -202,7 +198,7 @@ Once started, a QR Code will be printed in the terminal and/or the Expo Develope
 
 ---
 
-## 📱 Screens & Navigation Flow
+## Screens & Navigation Flow
 
 * **Login Screen (`LoginScreen.js`):** Entry point of the application, permitting students to securely authenticate using their email and password.
 * **Forgot Password Screen (`ForgotPasswordScreen.js`):** Interface to request a password reset, triggering an automated email containing new credentials from the backend.
@@ -214,7 +210,7 @@ Once started, a QR Code will be printed in the terminal and/or the Expo Develope
 
 ---
 
-## 📝 Future Improvements
+## Future Improvements
 
 * **Push Notifications:** Real-time push alerts sent to devices when coordinators update certificate status.
 * **Offline Support with Caching:** Local caching of the student's progress and history data for offline visibility.
@@ -223,7 +219,7 @@ Once started, a QR Code will be printed in the terminal and/or the Expo Develope
 
 ---
 
-## 👥 Authors & Project Team
+## Authors & Project Team
 
 * **Homero Flávio**
 * **Joelson José**
@@ -233,6 +229,5 @@ Once started, a QR Code will be printed in the terminal and/or the Expo Develope
 * **Nicollas Abrão**
 * **Thayanne Rodrigues**
 
-### Academic Advisors
-* **Academic Advisor / Coordinator:** Prof. ____________
+### Academic Advisor
 * **Technical English Course Professor:** Prof. Leonardo Trevas
